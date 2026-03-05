@@ -39,7 +39,7 @@ export class IfcService {
     if (this.initialized) return
 
     // Point to the WASM files in public/wasm/
-    this.ifcApi.SetWasmPath('/wasm/')
+    this.ifcApi.SetWasmPath(`${import.meta.env.BASE_URL}wasm/`)
     await this.ifcApi.Init()
     this.initialized = true
   }
