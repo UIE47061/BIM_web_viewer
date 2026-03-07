@@ -310,7 +310,7 @@ function formatTime(d: Date): string {
 .drc-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 110;
+  z-index: 2000;
   background: rgba(0, 0, 0, 0.25);
 }
 
@@ -321,7 +321,7 @@ function formatTime(d: Date): string {
   right: 0;
   width: 400px;
   height: 100vh;
-  z-index: 120;
+  z-index: 2010;
   background: var(--bg-secondary);
   border-left: 1px solid var(--border-color);
   display: flex;
