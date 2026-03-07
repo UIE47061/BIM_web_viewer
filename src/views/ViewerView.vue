@@ -1,20 +1,5 @@
 <template>
   <div class="viewer-layout">
-    <!-- Sidebar -->
-    <Transition name="sidebar">
-      <aside v-show="!store.sidebarCollapsed" class="viewer-layout__sidebar">
-        <SidebarPanel
-          @file-selected="handleFileSelected"
-          @toggle-category="handleToggleCategory"
-          @show-all="handleShowAll"
-          @hide-all="handleHideAll"
-          @toggle-storey="handleToggleStorey"
-          @show-all-storeys="handleShowAllStoreys"
-          @hide-all-storeys="handleHideAllStoreys"
-        />
-      </aside>
-    </Transition>
-
     <!-- Main viewport -->
     <main class="viewer-layout__main">
       <ViewerToolbar
@@ -24,7 +9,6 @@
         @toggle-axes="handleToggleAxes"
         @toggle-wireframe="handleToggleWireframe"
         @open-file="openFilePicker"
-        @toggle-sidebar="store.toggleSidebar()"
         @set-up-axis="handleSetUpAxis"
         @clear-drc="handleClearDrc"
       />
@@ -33,6 +17,47 @@
         @file-selected="handleFileSelected"
       />
     </main>
+
+    <!-- Floating panels -->
+    <template v-if="store.modelLoaded">
+      <FloatingPanel
+        v-model="store.panelStoreys"
+        title="Storeys"
+        :init-x="10"
+        :init-y="54"
+        :width="300"
+      >
+        <StoreyTree
+          @toggle-storey="handleToggleStorey"
+          @show-all="handleShowAllStoreys"
+          @hide-all="handleHideAllStoreys"
+        />
+      </FloatingPanel>
+
+      <FloatingPanel
+        v-model="store.panelCategories"
+        title="Categories"
+        :init-x="10"
+        :init-y="340"
+        :width="300"
+      >
+        <CategoryTree
+          @toggle-category="handleToggleCategory"
+          @show-all="handleShowAll"
+          @hide-all="handleHideAll"
+        />
+      </FloatingPanel>
+
+      <FloatingPanel
+        v-model="store.panelProperties"
+        title="Properties"
+        :init-x="propertiesInitX"
+        :init-y="54"
+        :width="320"
+      >
+        <PropertiesPanel />
+      </FloatingPanel>
+    </template>
 
     <!-- DRC Panel -->
     <DrcPanel
@@ -65,8 +90,11 @@ import type { CategoryInfo } from '@/types/ifc'
 
 import ThreeCanvas from '@/components/viewer/ThreeCanvas.vue'
 import ViewerToolbar from '@/components/viewer/ViewerToolbar.vue'
-import SidebarPanel from '@/components/sidebar/SidebarPanel.vue'
 import DrcPanel from '@/components/drc/DrcPanel.vue'
+import FloatingPanel from '@/components/common/FloatingPanel.vue'
+import StoreyTree from '@/components/sidebar/StoreyTree.vue'
+import CategoryTree from '@/components/sidebar/CategoryTree.vue'
+import PropertiesPanel from '@/components/sidebar/PropertiesPanel.vue'
 
 const store = useViewerStore()
 const drcStore = useDrcStore()
@@ -75,6 +103,8 @@ const threeCanvasRef = ref<InstanceType<typeof ThreeCanvas> | null>(null)
 const hiddenFileInput = ref<HTMLInputElement | null>(null)
 const ifcService = new IfcService()
 const drcService = new DrcService()
+
+const propertiesInitX = Math.max(window.innerWidth - 330, 10)
 
 // ---------- Scene access ----------
 
@@ -336,33 +366,11 @@ onBeforeUnmount(() => {
   background: var(--bg-primary);
 }
 
-.viewer-layout__sidebar {
-  width: var(--sidebar-width);
-  min-width: var(--sidebar-width);
-  height: 100%;
-  border-right: 1px solid var(--border-color);
-  overflow: hidden;
-  flex-shrink: 0;
-  z-index: 30;
-}
-
 .viewer-layout__main {
   flex: 1;
   display: flex;
   flex-direction: column;
   min-width: 0;
   height: 100%;
-}
-
-/* Sidebar transition */
-.sidebar-enter-active,
-.sidebar-leave-active {
-  transition: all 0.25s ease;
-}
-
-.sidebar-enter-from,
-.sidebar-leave-to {
-  margin-left: calc(var(--sidebar-width) * -1);
-  opacity: 0;
 }
 </style>

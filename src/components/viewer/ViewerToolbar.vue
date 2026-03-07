@@ -37,7 +37,7 @@
         <select
           class="upaxis-select"
           :value="store.upAxis"
-          @change="$emit('set-up-axis', ($event.target as HTMLSelectElement).value)"
+          @change="onUpAxisChange"
         >
           <option value="X+">X+</option>
           <option value="X-">X−</option>
@@ -58,6 +58,27 @@
 
     <!-- Right group -->
     <div class="viewer-toolbar__group">
+      <!-- Panel toggles (only when model loaded) -->
+      <template v-if="store.modelLoaded">
+        <IconButton
+          :icon="icons.storeys"
+          tooltip="Storeys 樓層"
+          :active="store.panelStoreys"
+          @click="store.panelStoreys = !store.panelStoreys"
+        />
+        <IconButton
+          :icon="icons.categories"
+          tooltip="Categories 分類"
+          :active="store.panelCategories"
+          @click="store.panelCategories = !store.panelCategories"
+        />
+        <IconButton
+          :icon="icons.properties"
+          tooltip="Properties 屬性"
+          :active="store.panelProperties"
+          @click="store.panelProperties = !store.panelProperties"
+        />
+      </template>
       <div class="viewer-toolbar__divider" />
       <!-- DRC buttons (only when model loaded) -->
       <template v-if="store.modelLoaded">
@@ -84,12 +105,6 @@
         tooltip="Open another file"
         @click="$emit('open-file')"
       />
-      <IconButton
-        :icon="icons.sidebar"
-        tooltip="Toggle sidebar"
-        :active="!store.sidebarCollapsed"
-        @click="$emit('toggle-sidebar')"
-      />
     </div>
   </div>
 </template>
@@ -103,9 +118,11 @@ import {
   mdiVectorLine,
   mdiFileOutline,
   mdiFolderOpenOutline,
-  mdiPageLayoutSidebarLeft,
   mdiCheckDecagram,
   mdiEraserVariant,
+  mdiFloorPlan,
+  mdiFormatListBulletedType,
+  mdiInformationOutline,
 } from '@mdi/js'
 import { useViewerStore } from '@/stores/viewerStore'
 import { useDrcStore } from '@/stores/drcStore'
@@ -123,19 +140,20 @@ const icons = {
   wireframe: mdiVectorLine,
   file: mdiFileOutline,
   upload: mdiFolderOpenOutline,
-  sidebar: mdiPageLayoutSidebarLeft,
   drc: mdiCheckDecagram,
   clearDrc: mdiEraserVariant,
+  storeys: mdiFloorPlan,
+  categories: mdiFormatListBulletedType,
+  properties: mdiInformationOutline,
 }
 
-defineEmits<{
+const emit = defineEmits<{
   fit: []
   'reset-view': []
   'toggle-grid': []
   'toggle-axes': []
   'toggle-wireframe': []
   'open-file': []
-  'toggle-sidebar': []
   'set-up-axis': [axis: 'X+' | 'X-' | 'Y+' | 'Y-' | 'Z+' | 'Z-']
   'run-drc': []
   'clear-drc': []
@@ -147,6 +165,11 @@ function formatFileSize(bytes: number): string {
   const sizes = ['B', 'KB', 'MB', 'GB']
   const i = Math.floor(Math.log(bytes) / Math.log(k))
   return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]
+}
+
+function onUpAxisChange(e: Event) {
+  const val = (e.target as HTMLSelectElement).value as 'X+' | 'X-' | 'Y+' | 'Y-' | 'Z+' | 'Z-'
+  emit('set-up-axis', val)
 }
 </script>
 

@@ -31,8 +31,12 @@ export const useViewerStore = defineStore('viewer', () => {
   const showGrid = ref(true)
   const showAxes = ref(true)
   const wireframeMode = ref(false)
-  const sidebarCollapsed = ref(false)
   const upAxis = ref<'X+' | 'X-' | 'Y+' | 'Y-' | 'Z+' | 'Z-'>('Y+')
+
+  // Floating panel visibility
+  const panelStoreys = ref(true)
+  const panelCategories = ref(true)
+  const panelProperties = ref(true)
 
   // ---------- Getters ----------
 
@@ -121,10 +125,6 @@ export const useViewerStore = defineStore('viewer', () => {
     wireframeMode.value = !wireframeMode.value
   }
 
-  function toggleSidebar() {
-    sidebarCollapsed.value = !sidebarCollapsed.value
-  }
-
   function toggleStoreyVisibility(name: string) {
     const s = storeys.value.find((s) => s.name === name)
     if (s) s.visible = !s.visible
@@ -161,8 +161,10 @@ export const useViewerStore = defineStore('viewer', () => {
     showGrid,
     showAxes,
     wireframeMode,
-    sidebarCollapsed,
     upAxis,
+    panelStoreys,
+    panelCategories,
+    panelProperties,
 
     // Getters
     visibleCategories,
@@ -183,7 +185,6 @@ export const useViewerStore = defineStore('viewer', () => {
     toggleGrid,
     toggleAxes,
     toggleWireframe,
-    toggleSidebar,
     setUpAxis,
     toggleStoreyVisibility,
     setStoreyVisibility,

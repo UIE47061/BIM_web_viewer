@@ -75,7 +75,6 @@ defineEmits<{
 
 <style scoped>
 .category-tree {
-  border-bottom: 1px solid var(--border-color);
 }
 
 .category-tree__header {

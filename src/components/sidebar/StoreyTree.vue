@@ -89,7 +89,6 @@ defineEmits<{
 
 <style scoped>
 .storey-tree {
-  border-bottom: 1px solid var(--border-color);
 }
 
 .storey-tree__header {

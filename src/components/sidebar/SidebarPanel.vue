@@ -22,20 +22,33 @@
       <span>{{ store.loadingMessage || 'Loading model...' }}</span>
     </div>
 
-    <!-- Categories -->
-    <template v-if="store.modelLoaded">
-      <StoreyTree
-        @toggle-storey="$emit('toggle-storey', $event)"
-        @show-all="$emit('show-all-storeys')"
-        @hide-all="$emit('hide-all-storeys')"
-      />
-      <CategoryTree
-        @toggle-category="$emit('toggle-category', $event)"
-        @show-all="$emit('show-all')"
-        @hide-all="$emit('hide-all')"
-      />
-      <PropertiesPanel />
-    </template>
+    <!-- Panel toggles -->
+    <div v-if="store.modelLoaded" class="sidebar-panel__toggles">
+      <button
+        class="sidebar-panel__toggle-btn"
+        :class="{ active: store.panelStoreys }"
+        @click="store.panelStoreys = !store.panelStoreys"
+      >
+        <SvgIcon :path="icons.floor" :size="16" />
+        <span>Storeys</span>
+      </button>
+      <button
+        class="sidebar-panel__toggle-btn"
+        :class="{ active: store.panelCategories }"
+        @click="store.panelCategories = !store.panelCategories"
+      >
+        <SvgIcon :path="icons.category" :size="16" />
+        <span>Categories</span>
+      </button>
+      <button
+        class="sidebar-panel__toggle-btn"
+        :class="{ active: store.panelProperties }"
+        @click="store.panelProperties = !store.panelProperties"
+      >
+        <SvgIcon :path="icons.property" :size="16" />
+        <span>Properties</span>
+      </button>
+    </div>
 
     <!-- Footer -->
     <div class="sidebar-panel__footer">
@@ -47,28 +60,27 @@
 </template>
 
 <script setup lang="ts">
-import { mdiOfficeBuildingOutline } from '@mdi/js'
+import {
+  mdiOfficeBuildingOutline,
+  mdiFloorPlan,
+  mdiFormatListBulletedType,
+  mdiInformationOutline,
+} from '@mdi/js'
 import { useViewerStore } from '@/stores/viewerStore'
 import SvgIcon from '@/components/common/SvgIcon.vue'
 import FileDropZone from '@/components/common/FileDropZone.vue'
-import CategoryTree from './CategoryTree.vue'
-import StoreyTree from './StoreyTree.vue'
-import PropertiesPanel from './PropertiesPanel.vue'
 
 const store = useViewerStore()
 
 const icons = {
   building: mdiOfficeBuildingOutline,
+  floor: mdiFloorPlan,
+  category: mdiFormatListBulletedType,
+  property: mdiInformationOutline,
 }
 
 defineEmits<{
   'file-selected': [file: File]
-  'toggle-category': [name: string]
-  'show-all': []
-  'hide-all': []
-  'toggle-storey': [name: string]
-  'show-all-storeys': []
-  'hide-all-storeys': []
 }>()
 </script>
 
@@ -130,5 +142,37 @@ defineEmits<{
 .sidebar-panel__footer-text {
   font-size: 11px;
   color: var(--text-muted);
+}
+
+.sidebar-panel__toggles {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-panel__toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.sidebar-panel__toggle-btn:hover {
+  background: var(--bg-surface-hover);
+  color: var(--text-primary);
+}
+
+.sidebar-panel__toggle-btn.active {
+  background: var(--bg-surface);
+  color: var(--accent-primary);
 }
 </style>
