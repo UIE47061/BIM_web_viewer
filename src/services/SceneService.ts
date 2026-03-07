@@ -86,9 +86,8 @@ export class SceneService {
     this.axesHelper.name = 'axes'
     this.scene.add(this.axesHelper)
 
-    // Model group (rotated to convert Z-up to Y-up)
+    // Model group (default Y+ up, no rotation needed)
     this.modelGroup.name = 'model'
-    this.modelGroup.rotation.x = -Math.PI / 2
     this.scene.add(this.modelGroup)
 
     // Events
@@ -291,16 +290,26 @@ export class SceneService {
     this.controls.update()
   }
 
-  setUpAxis(axis: 'X' | 'Y' | 'Z'): void {
-    // IFC Z-up → Three.js Y-up 需要繞 X 軸旋轉 -90°
-    // IFC Y-up 或已轉換的檔案 → 不需要旋轉
-    // IFC X-up → 繞 Z 軸旋轉 +90° 讓 X 軸指向 Three.js Y
-    if (axis === 'Z') {
-      this.modelGroup.rotation.set(-Math.PI / 2, 0, 0)
-    } else if (axis === 'Y') {
-      this.modelGroup.rotation.set(0, 0, 0)
-    } else {
-      this.modelGroup.rotation.set(0, 0, Math.PI / 2)
+  setUpAxis(axis: 'X+' | 'X-' | 'Y+' | 'Y-' | 'Z+' | 'Z-'): void {
+    switch (axis) {
+      case 'X+':
+        this.modelGroup.rotation.set(0, 0, Math.PI / 2)
+        break
+      case 'X-':
+        this.modelGroup.rotation.set(0, 0, -Math.PI / 2)
+        break
+      case 'Y+':
+        this.modelGroup.rotation.set(0, 0, 0)
+        break
+      case 'Y-':
+        this.modelGroup.rotation.set(Math.PI, 0, 0)
+        break
+      case 'Z+':
+        this.modelGroup.rotation.set(-Math.PI / 2, 0, 0)
+        break
+      case 'Z-':
+        this.modelGroup.rotation.set(Math.PI / 2, 0, 0)
+        break
     }
   }
 

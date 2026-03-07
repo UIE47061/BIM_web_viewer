@@ -32,7 +32,7 @@ export const useViewerStore = defineStore('viewer', () => {
   const showAxes = ref(true)
   const wireframeMode = ref(false)
   const sidebarCollapsed = ref(false)
-  const upAxis = ref<'X' | 'Y' | 'Z'>('Z')
+  const upAxis = ref<'X+' | 'X-' | 'Y+' | 'Y-' | 'Z+' | 'Z-'>('Y+')
 
   // ---------- Getters ----------
 
@@ -143,7 +143,7 @@ export const useViewerStore = defineStore('viewer', () => {
     storeys.value.forEach((s) => (s.visible = false))
   }
 
-  function setUpAxis(axis: 'X' | 'Y' | 'Z') {
+  function setUpAxis(axis: 'X+' | 'X-' | 'Y+' | 'Y-' | 'Z+' | 'Z-') {
     upAxis.value = axis
   }
 

@@ -34,24 +34,18 @@
       <div class="viewer-toolbar__divider" />
       <div class="viewer-toolbar__upaxis">
         <span class="viewer-toolbar__upaxis-label">朝上軸</span>
-        <button
-          class="upaxis-btn"
-          :class="{ active: store.upAxis === 'X' }"
-          title="X 軸朝上"
-          @click="$emit('set-up-axis', 'X')"
-        >X</button>
-        <button
-          class="upaxis-btn"
-          :class="{ active: store.upAxis === 'Y' }"
-          title="Y 軸朝上"
-          @click="$emit('set-up-axis', 'Y')"
-        >Y</button>
-        <button
-          class="upaxis-btn"
-          :class="{ active: store.upAxis === 'Z' }"
-          title="Z 軸朝上（IFC 標準）"
-          @click="$emit('set-up-axis', 'Z')"
-        >Z</button>
+        <select
+          class="upaxis-select"
+          :value="store.upAxis"
+          @change="$emit('set-up-axis', ($event.target as HTMLSelectElement).value)"
+        >
+          <option value="X+">X+</option>
+          <option value="X-">X−</option>
+          <option value="Y+">Y+</option>
+          <option value="Y-">Y−</option>
+          <option value="Z+">Z+</option>
+          <option value="Z-">Z−</option>
+        </select>
       </div>
     </div>
 
@@ -142,7 +136,7 @@ defineEmits<{
   'toggle-wireframe': []
   'open-file': []
   'toggle-sidebar': []
-  'set-up-axis': [axis: 'X' | 'Y' | 'Z']
+  'set-up-axis': [axis: 'X+' | 'X-' | 'Y+' | 'Y-' | 'Z+' | 'Z-']
   'run-drc': []
   'clear-drc': []
 }>()
@@ -217,12 +211,9 @@ function formatFileSize(bytes: number): string {
   white-space: nowrap;
 }
 
-.upaxis-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
+.upaxis-select {
   height: 26px;
+  padding: 0 4px;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   background: transparent;
@@ -231,17 +222,12 @@ function formatFileSize(bytes: number): string {
   font-weight: 600;
   cursor: pointer;
   transition: all var(--transition-fast);
-  line-height: 1;
+  outline: none;
 }
 
-.upaxis-btn:hover {
+.upaxis-select:hover,
+.upaxis-select:focus {
   background: var(--bg-surface-hover);
   color: var(--text-primary);
-}
-
-.upaxis-btn.active {
-  background: var(--accent-primary);
-  color: white;
-  border-color: var(--accent-primary);
 }
 </style>

@@ -221,7 +221,7 @@ function handleToggleWireframe() {
   getScene()?.setWireframe(store.wireframeMode)
 }
 
-function handleSetUpAxis(axis: 'X' | 'Y' | 'Z') {
+function handleSetUpAxis(axis: 'X+' | 'X-' | 'Y+' | 'Y-' | 'Z+' | 'Z-') {
   store.setUpAxis(axis)
   getScene()?.setUpAxis(axis)
 }
