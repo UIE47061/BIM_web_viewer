@@ -383,13 +383,20 @@ export class IfcService {
             const props: PropertyItem[] = []
 
             const hasProperties = pset.HasProperties || []
-            for (const prop of hasProperties) {
+            for (let pi = 0; pi < hasProperties.length; pi++) {
+              const prop = hasProperties[pi]
               if (prop && prop.Name?.value != null) {
                 let value: string | number | boolean = ''
                 if (prop.NominalValue?.value != null) {
                   value = prop.NominalValue.value
                 }
-                props.push({ name: prop.Name.value, value })
+                props.push({
+                  name: prop.Name.value,
+                  value,
+                  editable: true,
+                  psetId,
+                  propIndex: pi,
+                })
               }
             }
 
@@ -406,6 +413,39 @@ export class IfcService {
     }
 
     return result
+  }
+
+  /**
+   * Update a single property value in the IFC model (in-memory).
+   * Returns true on success.
+   */
+  updatePropertyValue(psetId: number, propIndex: number, newValue: string | number | boolean): boolean {
+    if (this.modelID === null) return false
+    try {
+      const pset = this.ifcApi.GetLine(this.modelID, psetId, true)
+      if (!pset) return false
+      const prop = pset.HasProperties?.[propIndex]
+      if (!prop || !prop.NominalValue) return false
+      prop.NominalValue.value = newValue
+      this.ifcApi.WriteLine(this.modelID, prop)
+      return true
+    } catch (e) {
+      console.warn('Failed to update property:', e)
+      return false
+    }
+  }
+
+  /**
+   * Export the current (possibly modified) IFC model as a Uint8Array.
+   */
+  saveModel(): Uint8Array | null {
+    if (this.modelID === null) return null
+    try {
+      return this.ifcApi.SaveModel(this.modelID)
+    } catch (e) {
+      console.warn('Failed to save model:', e)
+      return null
+    }
   }
 
   dispose(): void {

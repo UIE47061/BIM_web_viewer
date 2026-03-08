@@ -20,6 +20,12 @@ export interface PropertyGroup {
 export interface PropertyItem {
   name: string
   value: string | number | boolean
+  /** If true, this property can be edited and saved back to the IFC model */
+  editable?: boolean
+  /** Internal: property set expressID (for write-back) */
+  psetId?: number
+  /** Internal: index within HasProperties array (for write-back) */
+  propIndex?: number
 }
 
 export interface ModelStats {

@@ -55,7 +55,10 @@
         :init-y="54"
         :width="320"
       >
-        <PropertiesPanel />
+        <PropertiesPanel
+          @edit-property="handleEditProperty"
+          @download="handleDownloadIfc"
+        />
       </FloatingPanel>
     </template>
 
@@ -348,6 +351,25 @@ function handleFocusElement(expressID: number) {
   // Select the element to show properties and highlight it
   const props = ifcService.getElementProperties(expressID)
   store.setSelectedElement(expressID, props)
+}
+
+// ---------- Property editing ----------
+
+function handleEditProperty(psetId: number, propIndex: number, newValue: string | number | boolean) {
+  ifcService.updatePropertyValue(psetId, propIndex, newValue)
+}
+
+function handleDownloadIfc() {
+  const data = ifcService.saveModel()
+  if (!data) return
+  const blob = new Blob([new Uint8Array(data)], { type: 'application/octet-stream' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  const baseName = store.modelStats.fileName.replace(/\.ifc$/i, '')
+  a.download = `${baseName}_modified.ifc`
+  a.click()
+  URL.revokeObjectURL(url)
 }
 
 // ---------- Cleanup ----------
