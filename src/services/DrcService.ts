@@ -151,7 +151,56 @@ const RULE_CHECKERS: Record<string, CheckFn> = {
     }
     return null
   },
+  // ── 台灣建築技術規則 ────────────────────────────────
+  tw_private_road_width: (size, params, name) => {
+    // Treat as road if name suggests
+    const isRoad = /road|path|street|通道|私設道路/i.test(name)
+    if (!isRoad) return null
 
+    const length = Math.max(size.x, size.z)
+    const width = Math.min(size.x, size.z)
+    
+    let requiredWidth = 0
+    if (length >= 20) {
+      requiredWidth = params.minWidthForLong
+    } else if (length >= 10) {
+      requiredWidth = params.minWidthForMid
+    } else {
+      requiredWidth = params.minWidthForShort
+    }
+
+    if (width > 0.1 && width < requiredWidth) {
+      return { actual: width, required: requiredWidth, unit: 'm' }
+    }
+    return null
+  },
+
+  tw_waterproof_gate_height: (size, params, name) => {
+    // Only check flood/waterproof gates
+    const isFloodGate = /flood|waterproof|防水|閘門|擋水/i.test(name)
+    if (!isFloodGate) return null
+
+    const height = size.y
+    const minHeight = params.minHeight
+    if (height > 0.05 && height < minHeight) {
+      return { actual: height, required: minHeight, unit: 'm' }
+    }
+    return null
+  },
+
+  tw_balcony_depth: (size, params, name) => {
+    // Only check balconies, eaves, canopies
+    const isBalcony = /balcony|eave|canopy|陽臺|陽台|雨遮|屋簷/i.test(name)
+    if (!isBalcony) return null
+
+    // depth is usually the shorter of X/Z
+    const depth = Math.min(size.x, size.z)
+    const maxDepth = params.maxDepth
+    if (depth > maxDepth) {
+      return { actual: depth, required: maxDepth, unit: 'm' }
+    }
+    return null
+  },
   // ── 消防門寬 ────────────────────────────────
   fire_door_width: (size, params) => {
     const width = Math.max(size.x, size.z)
@@ -194,6 +243,89 @@ const RULE_CHECKERS: Record<string, CheckFn> = {
     const min = params.minWidth
     if (width > 0.01 && width < min) {
       return { actual: width, required: min, unit: 'm' }
+    }
+    return null
+  },
+
+  // ── 欄杆高度 §38 ──────────────────────────
+  railing_height: (size, params) => {
+    const height = size.y
+    const min = params.minHeight
+    // Railings are typically 0.5–2.0 m tall; filter fabrication noise
+    if (height > 0.3 && height < min) {
+      return { actual: height, required: min, unit: 'm' }
+    }
+    return null
+  },
+
+  // ── 停車位淨寬 §60 ────────────────────────
+  parking_stall_width: (size, params, name) => {
+    const isParking = /停車|parking|car.?park|車位/i.test(name)
+    if (!isParking) return null
+    const width = Math.min(size.x, size.z)
+    const min = params.minWidth
+    if (width > 0.5 && width < min) {
+      return { actual: width, required: min, unit: 'm' }
+    }
+    return null
+  },
+
+  // ── 停車位淨長 §60 ────────────────────────
+  parking_stall_length: (size, params, name) => {
+    const isParking = /停車|parking|car.?park|車位/i.test(name)
+    if (!isParking) return null
+    const length = Math.max(size.x, size.z)
+    const min = params.minLength
+    if (length > 1.0 && length < min) {
+      return { actual: length, required: min, unit: 'm' }
+    }
+    return null
+  },
+
+  // ── 車道淨寬（單車道）§61 ───────────────────
+  car_lane_width: (size, params, name) => {
+    const isLane = /車道|car.?lane|driveway|access.?road/i.test(name)
+    if (!isLane) return null
+    const width = Math.min(size.x, size.z)
+    const min = params.minWidth
+    if (width > 1.0 && width < min) {
+      return { actual: width, required: min, unit: 'm' }
+    }
+    return null
+  },
+
+  // ── 騎樓淨高 §57 ──────────────────────────
+  arcade_height: (size, params, name) => {
+    const isArcade = /騎樓|arcade|colonnade|portico/i.test(name)
+    if (!isArcade) return null
+    const height = size.y
+    const min = params.minHeight
+    if (height > 0.5 && height < min) {
+      return { actual: height, required: min, unit: 'm' }
+    }
+    return null
+  },
+
+  // ── 騎樓淨寬 §57 ──────────────────────────
+  arcade_width: (size, params, name) => {
+    const isArcade = /騎樓|arcade|colonnade|portico/i.test(name)
+    if (!isArcade) return null
+    const width = Math.min(size.x, size.z)
+    const min = params.minWidth
+    if (width > 0.5 && width < min) {
+      return { actual: width, required: min, unit: 'm' }
+    }
+    return null
+  },
+
+  // ── 教室天花板淨高 §32 ───────────────────────
+  classroom_height: (size, params, name) => {
+    const isClassroom = /教室|classroom|class.?room|lecture|學校.*室|school.*room/i.test(name)
+    if (!isClassroom) return null
+    const height = size.y
+    const min = params.minHeight
+    if (height > 0.5 && height < min) {
+      return { actual: height, required: min, unit: 'm' }
     }
     return null
   },

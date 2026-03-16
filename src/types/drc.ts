@@ -243,4 +243,66 @@ export const DEFAULT_DRC_RULES: DrcRuleConfig[] = [
       minWidth: { label: '最小淨寬', value: 1.5, unit: 'm', min: 0.8, max: 3.0, step: 0.1 },
     },
   },
+  // ── 台灣建築技術規則 (Taiwan specific) ──
+  {
+    id: 'tw_private_road_width',
+    nameZh: '台灣-私設通路寬度',
+    descZh: '依長度分級：<10m寬2m, <20m寬3m, ≥20m寬5m',
+    reference: '建築技術規則 §2',
+    category: '台灣建築技術規則',
+    severity: 'critical',
+    enabled: true,
+    affectedCategories: ['Spaces', 'Site'],
+    params: {
+      minWidthForLong: { label: '長度≥20m最小淨寬', value: 5.0, unit: 'm', min: 2.0, max: 8.0, step: 0.1 },
+      minWidthForMid:  { label: '長度10-20m最小淨寬', value: 3.0, unit: 'm', min: 2.0, max: 8.0, step: 0.1 },
+      minWidthForShort:{ label: '長度<10m最小淨寬', value: 2.0, unit: 'm', min: 1.0, max: 8.0, step: 0.1 },
+    },
+  },
+  {
+    id: 'tw_waterproof_gate_height',
+    nameZh: '台灣-防水閘門高度',
+    descZh: '地下層出入口防水閘門自基地地面起算應達90公分',
+    reference: '建築技術規則 §4-1',
+    category: '台灣建築技術規則',
+    severity: 'warning',
+    enabled: true,
+    affectedCategories: ['Accessory', 'Doors'],
+    params: {
+      minHeight: { label: '最小高度', value: 0.9, unit: 'm', min: 0.3, max: 2.0, step: 0.05 },
+    },
+  },
+  {
+    id: 'tw_balcony_depth',
+    nameZh: '台灣-陽台/雨遮突出深度',
+    descZh: '突出建築物外牆中心線超過一定深度應計入建築面積',
+    reference: '建築技術規則 §1 款3',
+    category: '台灣建築技術規則',
+    severity: 'notice',
+    enabled: true,
+    affectedCategories: ['Slabs', 'Roofs', 'Accessories'],
+    params: {
+      maxDepth: { label: '免計入最大深度', value: 2.0, unit: 'm', min: 0.5, max: 5.0, step: 0.1 },
+    },
+  },
 ]
+
+export type BuildingUsage = 'residential' | 'educational' | 'commercial'
+
+export const USAGE_RULE_OVERRIDES: Record<BuildingUsage, Record<string, Record<string, number>>> = {
+  residential: {
+    corridor_width: { minWidth: 1.2 },
+    stair_width: { minWidth: 1.2 },
+    room_height: { minHeight: 2.1 },
+  },
+  educational: {
+    corridor_width: { minWidth: 1.8 },
+    stair_width: { minWidth: 1.4 },
+    room_height: { minHeight: 3.0 },
+  },
+  commercial: {
+    corridor_width: { minWidth: 1.6 },
+    stair_width: { minWidth: 1.4 },
+    room_height: { minHeight: 2.5 },
+  }
+}

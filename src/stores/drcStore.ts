@@ -5,8 +5,8 @@
 
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { DEFAULT_DRC_RULES } from '@/types/drc'
-import type { DrcRuleConfig, DrcResult } from '@/types/drc'
+import { DEFAULT_DRC_RULES, USAGE_RULE_OVERRIDES } from '@/types/drc'
+import type { DrcRuleConfig, DrcResult, BuildingUsage } from '@/types/drc'
 
 export const useDrcStore = defineStore('drc', () => {
   // ---------- State ----------
@@ -14,6 +14,7 @@ export const useDrcStore = defineStore('drc', () => {
   const panelOpen = ref(false)
   const isRunning = ref(false)
   const result = ref<DrcResult | null>(null)
+  const buildingUsage = ref<BuildingUsage>('residential')
 
   // Deep-clone defaults so params are reactive and editable
   const rules = ref<DrcRuleConfig[]>(
@@ -74,6 +75,25 @@ export const useDrcStore = defineStore('drc', () => {
     }
   }
 
+  function setBuildingUsage(usage: BuildingUsage) {
+    buildingUsage.value = usage
+    const overrides = USAGE_RULE_OVERRIDES[usage]
+    
+    if (!overrides) return
+
+    // 遍歷當前所有的規則並套用對應的預設參數
+    rules.value.forEach(rule => {
+      if (overrides[rule.id]) {
+        const paramKeys = Object.keys(overrides[rule.id])
+        paramKeys.forEach(key => {
+          if (rule.params[key]) {
+            rule.params[key].value = overrides[rule.id][key]
+          }
+        })
+      }
+    })
+  }
+
   function resetRules() {
     rules.value = DEFAULT_DRC_RULES.map((r) => ({
       ...r,
@@ -81,6 +101,7 @@ export const useDrcStore = defineStore('drc', () => {
         Object.entries(r.params).map(([k, p]) => [k, { ...p }])
       ),
     }))
+    setBuildingUsage(buildingUsage.value)
   }
 
   return {
@@ -88,6 +109,7 @@ export const useDrcStore = defineStore('drc', () => {
     isRunning,
     result,
     rules,
+    buildingUsage,
     rulesByCategory,
     openPanel,
     closePanel,
@@ -97,6 +119,7 @@ export const useDrcStore = defineStore('drc', () => {
     clearResult,
     toggleRule,
     updateParam,
+    setBuildingUsage,
     resetRules,
   }
 })

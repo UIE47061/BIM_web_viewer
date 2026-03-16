@@ -80,6 +80,17 @@
 
       <!-- ── Settings tab ───────────────────── -->
       <div v-show="activeTab === 'settings'" class="drc-panel__body">
+        
+        <!-- 新增的用途切換器 -->
+        <div class="drc-usage-selector">
+          <label>建築物用途：</label>
+          <select class="drc-select" :value="drc.buildingUsage" @change="(e) => drc.setBuildingUsage((e.target as HTMLSelectElement).value as any)">
+            <option value="residential">住宅 (Residential) - H類</option>
+            <option value="educational">教育設施 (Educational) - D類</option>
+            <option value="commercial">商業空間 (Commercial) - B類</option>
+          </select>
+        </div>
+
         <div
           v-for="(groupRules, groupName) in drc.rulesByCategory()"
           :key="groupName"
@@ -457,6 +468,44 @@ function formatTime(d: Date): string {
 }
 
 /* ── rule group header (matches section-toggle) ── */
+.drc-usage-selector {
+  padding: 12px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.drc-usage-selector label {
+  font-size: 13px;
+  color: var(--text-primary);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.drc-select {
+  flex: 1;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%20%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M5%208l5%205%205-5%22%20stroke%3D%22%239ba1a6%22%20stroke-width%3D%221.5%22%20fill%3D%22none%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2Fx%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 16px;
+  padding-right: 28px;
+  transition: border-color var(--transition-fast);
+}
+
+.drc-select:focus {
+  border-color: var(--accent-primary);
+}
+
 .drc-group {
   border-bottom: 1px solid var(--border-color);
   padding-bottom: 4px;
